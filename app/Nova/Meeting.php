@@ -2,10 +2,12 @@
 
 namespace App\Nova;
 
+use Alexwenzel\DependencyContainer\DependencyContainer;
 use Devpartners\AuditableLog\AuditableLog;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Tag;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -48,7 +50,14 @@ class Meeting extends Resource
             DateTime::make('Início', 'inicio')->hideFromIndex(),
             DateTime::make('Término', 'termino')->hideFromIndex(),
             Text::make('Solicitante', 'solicitante'),
-            Text::make('Sala da Reunião', 'sala'),
+            Select::make('Sala da Reunião', 'sala')->options([
+                'sti' => 'STI',
+                'comando' => 'Comando',
+                'outro' => 'Outro'
+            ]),
+            DependencyContainer::make([
+                Text::make('Local da Reunião', 'outro')
+            ])->dependsOn('sala', 'outro'),
             Tag::make('Equipments'),
 
             AuditableLog::make()

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->dateTime('inicio');
             $table->dateTime('termino');
             $table->string('sala');
+            $table->string('outro')->nullable();
             $table->string('solicitante');
             $table->timestamps();
         });

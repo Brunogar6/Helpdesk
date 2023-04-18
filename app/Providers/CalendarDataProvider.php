@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Nova\Meeting;
+use Carbon\Carbon;
 use Wdelfuego\NovaCalendar\CalendarDay;
 use Wdelfuego\NovaCalendar\DataProvider\MonthCalendar;
 use Wdelfuego\NovaCalendar\Event;
@@ -47,26 +48,67 @@ class CalendarDataProvider extends MonthCalendar
     // generated events.
     protected function nonNovaEvents() : array
     {
-        return [];
-    }
+        $startDate = '2023/04/05';
+        $endDate = '2023/12/28';
 
-    protected function customizeCalendarDay(CalendarDay $day) : CalendarDay
-    {
-        if($day->start->format('w')  == 3)
-        {
-            $day->addBadge('❗CEL Carlos Zica❗');
+        $endDate = strtotime($endDate);
+        $quartas = [];
+
+        for($i = strtotime('Wednesday', strtotime($startDate)); $i <= $endDate; $i = strtotime('+1 week', $i)){
+            $newYear = new Carbon($i);
+            $quartas[] = (new Event("CEL Zica", $newYear))
+                ->addBadges('<pr style="background-color: transparent; color: white; border-radius: 5px; padding: 3.5px; font-weight: bold">Sala da STI 💻</pr>')
+                ->withNotes('08:00 - 12:00')
+                ->withStyle('sti');
         }
-
-        return $day;
+        return $quartas;
     }
 
     protected function customizeEvent(Event $event) : Event
     {
         if($event->model())
         {
-            $event->name($event->model()->solicitante . ' / Sala: ' . $event-> model()->sala);
-            $event->notes($event->model()->inicio->format('H:i') . ' - ' . $event->model()->termino->format('H:i'));
+            if($event->model()->sala === 'sti') {
+                $event->name($event->model()->solicitante);
+                $event->notes($event->model()->inicio->format('H:i') . ' - ' . $event->model()->termino->format('H:i'));
+                $event->addBadge('<pr style="background-color: transparent; color: white; border-radius: 5px; padding: 3.5px; font-weight: bold">Sala da STI 💻</pr>');
+                $event->addStyle('sti');
+            }
+
+            elseif($event->model()->sala === 'comando') {
+                $event->name($event->model()->solicitante);
+                $event->notes($event->model()->inicio->format('H:i') . ' - ' . $event->model()->termino->format('H:i'));
+                $event->addBadge('<pr style="background-color: transparent; color: white; border-radius: 5px; padding: 3.5px; font-weight: bold">Sala do Comando ✈️</pr>');
+                $event->addStyle('comando');
+            }
+
+            else {
+                $event->name($event->model()->solicitante);
+                $event->notes($event->model()->inicio->format('H:i') . ' - ' . $event->model()->termino->format('H:i'));
+                $event->addBadge('<pr style="background-color: transparent; color: white; border-radius: 5px; padding: 3.5px; font-weight: bold">'. $event->model()->outro . ' 📌' . '</pr>');
+                $event->addStyle('outro');
+
+            }
+
         }
         return $event;
+    }
+
+    public function eventStyles() : array
+    {
+        return [
+            'sti' => [
+                'color' => 'white',
+                'background-color' => 'darkorange'
+                ],
+            'comando' => [
+                'color' => 'white',
+                'background-color' => 'darkblue'
+                ],
+            'outro' => [
+                'color' => 'white',
+                'background-color' => 'darkmagenta'
+                ]
+            ];
     }
 }

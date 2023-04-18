@@ -18,3 +18,12 @@ Route::get('/', function () {
 });
 
 Route::get('/send', [\App\Http\Controllers\MessageController::class, 'send']);
+
+Route::get('/teste', function () {
+    $startDate = '2023/04/05';
+    $endDate = '2023/12/28';
+
+    $endDate = strtotime($endDate);
+    for($i = strtotime('Wednesday', strtotime($startDate)); $i <= $endDate; $i = strtotime('+1 week', $i))
+        echo date('d-m-Y ', $i);
+});
