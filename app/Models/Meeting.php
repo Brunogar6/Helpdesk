@@ -16,9 +16,4 @@ class Meeting extends Model implements Auditable
         'inicio' => 'datetime',
         'termino' => 'datetime',
     ];
-
-    public function equipments()
-    {
-        return $this->belongsToMany(Equipment::class);
-    }
 }

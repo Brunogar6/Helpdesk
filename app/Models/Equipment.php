@@ -13,9 +13,11 @@ class Equipment extends Model implements Auditable
 
     protected $table = "equipments";
 
-    protected $casts = [
-        'retirada' => 'date',
-        'devolucao' => 'date',
-    ];
+
+
+    public function lendings()
+    {
+        return $this->hasMany(Lending::class);
+    }
 
 }

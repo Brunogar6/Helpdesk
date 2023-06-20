@@ -14,12 +14,8 @@ return new class extends Migration
         Schema::create('equipments', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->string('solicitante');
-            $table->string('ramal');
-            $table->string('secao');
-            $table->date('retirada');
-            $table->date('devolucao');
-            $table->text('observacoes')->nullable();
+            $table->string('bmp');
+            $table->boolean('emprestado')->default(false)->nullable();
             $table->timestamps();
         });
     }

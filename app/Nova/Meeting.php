@@ -10,7 +10,9 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Tag;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use NormanHuth\IframePopup\IframePopup;
 
 class Meeting extends Resource
 {
@@ -47,8 +49,7 @@ class Meeting extends Resource
     {
         return [
             ID::make()->sortable(),
-            DateTime::make('Início', 'inicio')->hideFromIndex(),
-            DateTime::make('Término', 'termino')->hideFromIndex(),
+
             Text::make('Solicitante', 'solicitante'),
             Select::make('Sala da Reunião', 'sala')->options([
                 'sti' => 'STI',
@@ -58,7 +59,13 @@ class Meeting extends Resource
             DependencyContainer::make([
                 Text::make('Local da Reunião', 'outro')
             ])->dependsOn('sala', 'outro'),
-            Tag::make('Equipments'),
+            Textarea::make('Observações', 'observacoes'),
+            DateTime::make('Início', 'inicio')->hideFromIndex(),
+            DateTime::make('Término', 'termino')->hideFromIndex(),
+            IframePopup::make('', 'url',  function () {
+                return 'http://localhost:8081/nova/wdelfuego/nova-calendar';
+            })->icon('')->sufText('Reuniões')->hideFromIndex()->hideFromDetail(),
+
 
             AuditableLog::make()
         ];

@@ -2,31 +2,33 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\DevolverEquipamento;
 use Devpartners\AuditableLog\AuditableLog;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Date;
-use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Equipment extends Resource
+class Lending extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Equipment>
+     * @var class-string<\App\Models\Lending>
      */
-    public static $model = \App\Models\Equipment::class;
+    public static $model = \App\Models\Lending::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'nome';
+    public static $title = 'id';
 
     /**
      * The columns that should be searched.
@@ -34,7 +36,7 @@ class Equipment extends Resource
      * @var array
      */
     public static $search = [
-        'nome',
+        'id',
     ];
 
     /**
@@ -47,11 +49,17 @@ class Equipment extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Nome', 'nome'),
-            Text::make('BMP', 'bmp'),
-            HasMany::make('lendings'),
-            Boolean::make('Emprestado', 'emprestado')
+            Text::make('Solicitante', 'solicitante'),
+            Text::make('Ramal', 'ramal')->hideFromIndex(),
+            Text::make('Seção', 'secao')->hideFromIndex(),
+            BelongsTo::make('equipment'),
+            Date::make('Data de Emprestimo', 'inicio')->hideFromIndex(),
+            Date::make('Data de Devolução Prevista', 'previsto'),
+            Date::make('Data de Devolução', 'fim')->hideWhenCreating(),
+            Boolean::make('Devolvido', 'devolvido')
                 ->hideWhenCreating(),
+
+            Textarea::make('Observações', 'observacoes'),
 
             AuditableLog::make()
         ];
@@ -98,13 +106,29 @@ class Equipment extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [];
+        return [
+            new DevolverEquipamento()
+        ];
+    }
+
+    public static function afterCreate(NovaRequest $request, Model $model)
+    {
+
+        $equipament = \App\Models\Equipment::find($model->equipment_id);
+
+        $equipament->emprestado = True;
+        $equipament->save();
+    }
+
+    public static function relatableEquipment(NovaRequest $request, $query)
+    {
+        return $query->where('emprestado', false);
+
     }
 
     public static function label()
     {
-        return 'Equipamentos';
+        return 'Emprestimos';
     }
-
 
 }

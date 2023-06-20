@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('sala');
             $table->string('outro')->nullable();
             $table->string('solicitante');
+            $table->text('observacoes');
             $table->timestamps();
         });
     }
